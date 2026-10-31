@@ -56,6 +56,12 @@ int main(int argc, char *argv[]) {
 
     // Shows connection and closes both sockets
     printf("Client connected successfully!\n");
+
+    // Reading and printing message from client connection
+    int bytes_received = recvfrom(client_fd, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_address, &client_address_length);
+    buffer[bytes_received] = '\0';
+    puts(buffer);
+
     close(client_fd);
     close(server_fd);
 }

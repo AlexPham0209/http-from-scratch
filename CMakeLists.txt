@@ -17,7 +17,9 @@ add_library(
     http_library
     STATIC
     src/server.c
-    include/server.h 
+    include/server.h
+    src/socket.c 
+    include/socket.h
 )
 
 # So, we can have headers from different directories added to each other with a relative path to the project directory.

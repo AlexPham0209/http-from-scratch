@@ -13,7 +13,7 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
-# Fetching the GoogleTest unit testing framework
+# Fetching the Unity unit testing framework
 include(FetchContent)
 FetchContent_Declare(
     unity

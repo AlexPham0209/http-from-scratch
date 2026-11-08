@@ -1,5 +1,6 @@
 #include "server.h"
 #include <stdlib.h>
+#include "request.h"
 
 #define IP_ADDRESS "127.0.0.1"
 #define PORT 3000

@@ -9,4 +9,5 @@ typedef struct Request {
     const char* URI; 
 } Request;
 
+char* consume(char** str);
 Request* parse_request(char* request);

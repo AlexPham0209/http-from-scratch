@@ -1,3 +1,5 @@
+#include <stddef.h>
+#include <header.h>
 typedef enum Method {
     GET,
     POST,  
@@ -6,8 +8,12 @@ typedef enum Method {
 } Method;
 
 typedef struct Request {
-    const Method method;
-    const char* URI; 
+    char* data;
+    Method method;
+    Headers* headers;
+    char* request_target; 
+    char* version;
+    char* body;
 } Request;
 
 char* get_line(char** str);

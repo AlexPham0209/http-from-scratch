@@ -27,7 +27,7 @@ void test_get_line() {
 }
 
 void test_get_line_2(void) {
-    char str[1][100] = {"GET / HTTP/1.1r\n TEST2"};
+    char str[1][100] = {"GET / HTTP/1.1\r\n TEST2"};
     char* ptr = str[0];
     
     char* request_line = get_line(&ptr);

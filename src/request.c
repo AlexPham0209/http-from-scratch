@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 Request* parse_request(char* request) {
     // Parsing request line
@@ -14,21 +15,26 @@ Request* parse_request(char* request) {
     char* request_target = strsep(&request_line, " ");
     char* version = strsep(&request_line, " ");
 
+    printf("%s %s %s\n", method, request_target, version);
+
+    // Initializing dynamically growing list of headers with a starting capacity of 5 
+    Headers* headers = malloc(sizeof(Headers));
+    headers_init(headers, 5);
+    char* header = get_line(&curr);
+
     // Parsing headers
-    char* header = get_line(&curr); 
     while (header != NULL && strlen(header) > 0) { 
+        char* key = strsep(&header, ":");
+        char* value = header + 1;
+        
+        Header h = {key, value};
+        headers_add(headers, h);
         header = get_line(&curr);
     }
 
-    // Consume empty line
-    get_line(&curr);
-
     // Parsing body
     char* body = strdup(curr);
-
-    free(req);
-    req = NULL;
-    curr = NULL;
+    printf("%s\n", body);
     return NULL;
 }
 
@@ -46,9 +52,8 @@ Method get_method(char* method) {
 
 char* get_line(char** str) {
     if (!str || !*str) return NULL;
-   
-    char* res = strsep(str, "\r");
     
+    char* res = strsep(str, "\r");
     // Skipping \n token in line
     if (*str && **str == '\n') 
         (*str)++;

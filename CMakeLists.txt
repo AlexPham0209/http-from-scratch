@@ -35,8 +35,8 @@ add_library(
     include/request.h
     src/response.c
     include/response.h
-    src/map.c
-    include/map.h
+    src/header.c
+    include/header.h
 )
 
 # So, we can have headers from different directories added to each other with a relative path to the project directory.

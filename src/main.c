@@ -6,14 +6,18 @@
 #define PORT 3000
 
 int main(int argc, char *argv[]) {
-    Server server = {
-        PORT,
-        IP_ADDRESS,
-        1024
-    };
+    char str[1][100] = {"GET / HTTP/1.1\r\nKEY: VALUE\r\nKEY2: VALUE2\r\n\r\nBODY"};
+    char* ptr = str[0];
 
-    if (run(&server) == EXIT_FAILURE)
-        return EXIT_FAILURE;
+    parse_request(ptr);
+    // Server server = {
+    //     PORT,
+    //     IP_ADDRESS,
+    //     1024
+    // };
 
-    return EXIT_SUCCESS;
+    // if (run(&server) == EXIT_FAILURE)
+    //     return EXIT_FAILURE;
+
+    // return EXIT_SUCCESS;
 }

@@ -11,6 +11,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Setting directories
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+set(TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+
+# Fetching the GoogleTest unit testing framework
+include(FetchContent)
+FetchContent_Declare(
+    unity
+    GIT_REPOSITORY https://github.com/throwtheswitch/unity
+    GIT_TAG v2.7.0
+)
+FetchContent_MakeAvailable(unity)
+
+# Enable testing
+enable_testing()
 
 # Creating a static library
 add_library(
@@ -22,6 +35,8 @@ add_library(
     include/request.h
     src/response.c
     include/response.h
+    src/map.c
+    include/map.h
 )
 
 # So, we can have headers from different directories added to each other with a relative path to the project directory.
@@ -37,9 +52,24 @@ add_executable(
     ${SRC_DIR}/main.c
 )
 
+add_executable(
+    run_http_tests
+    test/test_request.c    
+)
+
 # Linking the library to the http_server executable target (http_server automatically gets access to ${INCLUDE_DIR} now)
 target_link_libraries(
     http_server
     PRIVATE
     http_library
 )
+
+# Linking http library and Google test library to unit tests executable
+target_link_libraries(
+    run_http_tests
+    PRIVATE
+    http_library
+    unity::framework
+)
+
+add_test(NAME http_tests COMMAND run_http_tests)

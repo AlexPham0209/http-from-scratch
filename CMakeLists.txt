@@ -54,7 +54,7 @@ add_executable(
 
 add_executable(
     run_http_tests
-    test/test_request.c    
+    tests/test_request.c    
 )
 
 # Linking the library to the http_server executable target (http_server automatically gets access to ${INCLUDE_DIR} now)

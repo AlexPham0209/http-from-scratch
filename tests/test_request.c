@@ -102,8 +102,6 @@ void test_request_only_lf(void) {
 void test_request_missing_request_line(void) {
     char request[] = "Host: example.com\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\"}"; 
     Request* req = parse_request(request);
-
-    // Asserting request is null
     TEST_ASSERT_NULL(req);
 }
 
@@ -129,22 +127,32 @@ void test_request_malformed_request_line(void) {
 }
 
 void test_request_malformed_header(void) {
-    char request_1[] = "GET\r\n\r\n\r\n\r\n{\"status\": \"ok\"}"; 
-    char request_2[] = "GET /\r\nHost\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\"}"; 
+    char request[] = "GET / HTTP/1.1\r\nHost\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\"}"; 
+    Request* req = parse_request(request);
+    TEST_ASSERT_NULL(req);
+}
 
-    Request* req_1 = parse_request(request_1);
-    Request* req_2 = parse_request(request_2);
+void test_request_missing_headers(void) {
+    char request[] = "GET / HTTP/1.1\r\n\r\n{\"status\": \"ok\"}"; 
+    Request* req = parse_request(request);
 
     // Asserting requests are null
-    TEST_ASSERT_NULL(req_1);
-    TEST_ASSERT_NULL(req_2);
+    TEST_ASSERT_EQUAL(GET, req->method);
+    TEST_ASSERT_EQUAL_STRING("/", req->request_target);
+    TEST_ASSERT_EQUAL_STRING("HTTP/1.1", req->version);
+
+    // Headers
+    Headers* headers = req->headers;
+    TEST_ASSERT_EQUAL(0, headers->size);
+
+    // Body 
+    TEST_ASSERT_EQUAL_STRING("{\"status\": \"ok\"}", req->body);
+    request_free(req);
 }
 
 void test_request_missing_empty_line(void) {
     char request[] = "GET / HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/json\r\n{\"status\": \"ok\"}"; 
     Request* req = parse_request(request);
-
-    // Asserting request is null
     TEST_ASSERT_NULL(req);
 }
 
@@ -182,6 +190,7 @@ int main(void) {
     RUN_TEST(test_request_missing_request_line);
     RUN_TEST(test_request_malformed_request_line);
     RUN_TEST(test_request_malformed_header);
+    RUN_TEST(test_request_missing_headers);
     RUN_TEST(test_request_missing_empty_line);
     RUN_TEST(test_request_empty_body);
     return UNITY_END();

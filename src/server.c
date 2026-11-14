@@ -69,6 +69,11 @@ void handle_connection(int fd, struct sockaddr_in* address, Server* server) {
     printf("Message: %s", buffer);
 
     // Parsing the request and creating a request object allocated to the heap
+    Request* request = parse_request(buffer);
+    if (request == NULL) {
+        perror("Invalid HTTP request");
+        return;
+    }
 
     // Sending a message back to the client
     const char* message = "Hello back";
@@ -77,5 +82,6 @@ void handle_connection(int fd, struct sockaddr_in* address, Server* server) {
     send(fd, message, message_length, 0);
         
     // Closing client socket connection
+    request_free(request);
     close(fd);
 }

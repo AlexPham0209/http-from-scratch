@@ -74,12 +74,29 @@ void test_request_success(void) {
     request_free(req);
 }
 
-void test_request_invalid_clrf(void) {
+void test_request_only_lf(void) {
     char request[] = "GET / HTTP/1.1\nHost: example.com\nContent-Type: application/json\n\n{\"status\": \"ok\"}"; 
     Request* req = parse_request(request);
 
     // Asserting request is not null safely
-    TEST_ASSERT_NULL(req);
+    TEST_ASSERT_NOT_NULL(req);
+
+    // Request line (expected, actual)
+    TEST_ASSERT_EQUAL(GET, req->method);
+    TEST_ASSERT_EQUAL_STRING("/", req->request_target);
+    TEST_ASSERT_EQUAL_STRING("HTTP/1.1", req->version);
+
+    // Headers
+    Headers* headers = req->headers;
+    TEST_ASSERT_EQUAL(2, headers->size);
+    TEST_ASSERT_EQUAL_STRING("Host", headers->data[0].key);
+    TEST_ASSERT_EQUAL_STRING("example.com", headers->data[0].value);
+    TEST_ASSERT_EQUAL_STRING("Content-Type", headers->data[1].key);
+    TEST_ASSERT_EQUAL_STRING("application/json", headers->data[1].value);
+
+    // Body 
+    TEST_ASSERT_EQUAL_STRING("{\"status\": \"ok\"}", req->body);
+    request_free(req);
 }
 
 void test_request_missing_request_line(void) {
@@ -161,7 +178,7 @@ int main(void) {
     RUN_TEST(test_get_line);
     RUN_TEST(test_get_line_2);
     RUN_TEST(test_request_success);
-    RUN_TEST(test_request_invalid_clrf);
+    RUN_TEST(test_request_only_lf);
     RUN_TEST(test_request_missing_request_line);
     RUN_TEST(test_request_malformed_request_line);
     RUN_TEST(test_request_malformed_header);

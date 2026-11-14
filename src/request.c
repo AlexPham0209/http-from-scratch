@@ -6,7 +6,7 @@
 
 Request* parse_request(char* request) {
     // Invalid request if there is no empty line
-    if (!strstr(request, "\r\n\r\n"))
+    if (!strstr(request, "\r\n\r\n") && !strstr(request, "\n\n"))
         return NULL;
 
     // Duplicating request string (heap-allocated)
@@ -62,9 +62,11 @@ Request* parse_request(char* request) {
             return NULL;
         }
         
-        // Skip over whitespace header
-        char* value = header + 1;
-        
+        // Skips over whitespaces 
+        char* value = header;
+        while (*value == ' ' && *value != '\0')
+            value++;
+
         // Creating header object and added it to dynamic headers list
         Header h = {key, value};
         headers_add(headers, h);
@@ -108,10 +110,12 @@ char* get_line(char** str) {
     if (!str || !*str) 
         return NULL;
     
-    char* res = strsep(str, "\r");
-    // Skipping \n token in line
-    if (*str && **str == '\n') 
-        (*str)++;
-    
+    char* res = strsep(str, "\n");
+
+    // Strip \r from string
+    size_t length = strlen(res);
+    if (length > 0 && res[length - 1] == '\r')
+        res[length - 1] = '\0';
+
     return res;
 }

@@ -5,17 +5,48 @@
 #include <stdio.h>
 
 Request* parse_request(char* request) {
-    // Parsing request line
-    char* req = strdup(request); 
-    char* curr = req; 
-    char* request_line = get_line(&curr);  
+    // Invalid request if there is no empty line
+    if (!strstr(request, "\r\n\r\n"))
+        return NULL;
+
+    // Duplicating request string (heap-allocated)
+    char* data = strdup(request); 
+    char* curr = data;
 
     // Getting request line information (Method, request target, HTTP Version) 
-    char* method = strsep(&request_line, " ");
-    char* request_target = strsep(&request_line, " ");
-    char* version = strsep(&request_line, " ");
+    char* request_line = get_line(&curr); 
+    if (curr == NULL) {
+        free(data);
+        return NULL;
+    }
+    
+    // Parsing method string 
+    char* method_str = strsep(&request_line, " ");
+    if (request_line == NULL) {
+        free(data);
+        return NULL;
+    }
 
-    printf("%s %s %s\n", method, request_target, version);
+    // Converting method string into Method enum
+    Method method = get_method(method_str);
+    if (method == INVALID) {
+        free(data);
+        return NULL; 
+    } 
+
+    // Parsing request target or end point 
+    char* request_target = strsep(&request_line, " ");
+    if (request_line == NULL) {
+        free(data);
+        return NULL; 
+    }
+
+    // Parsing version
+    char* version = strsep(&request_line, " ");
+    if (strlen(version) == 0 || request_line != NULL) {
+        free(data);
+        return NULL; 
+    }
 
     // Initializing dynamically growing list of headers with a starting capacity of 5 
     Headers* headers = malloc(sizeof(Headers));
@@ -24,18 +55,35 @@ Request* parse_request(char* request) {
 
     // Parsing headers
     while (header != NULL && strlen(header) > 0) { 
-        char* key = strsep(&header, ":");
+        char* key = strsep(&header, ":"); 
+        if (header == NULL) {
+            free(data);
+            headers_free(headers);
+            return NULL;
+        }
+        
+        // Skip over whitespace header
         char* value = header + 1;
         
+        // Creating header object and added it to dynamic headers list
         Header h = {key, value};
         headers_add(headers, h);
         header = get_line(&curr);
     }
 
     // Parsing body
-    char* body = strdup(curr);
-    printf("%s\n", body);
-    return NULL;
+    char* body = curr;
+    
+    // Setting request object
+    Request* req = malloc(sizeof(Request));
+    req->data = data;
+    req->headers = headers;
+    req->request_target = request_target;
+    req->method = method;
+    req->version = version;
+    req->body = body;
+
+    return req;
 }
 
 Method get_method(char* method) {
@@ -47,11 +95,18 @@ Method get_method(char* method) {
         return PUT;
     else if (strcmp(method, "DELETE") == 0)
         return DELETE;     
-    return GET;
+    return INVALID;
+}
+
+void request_free(Request* request) {
+    headers_free(request->headers);
+    free(request->data);
+    free(request);
 }
 
 char* get_line(char** str) {
-    if (!str || !*str) return NULL;
+    if (!str || !*str) 
+        return NULL;
     
     char* res = strsep(str, "\r");
     // Skipping \n token in line

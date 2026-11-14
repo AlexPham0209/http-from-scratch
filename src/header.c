@@ -1,7 +1,6 @@
 #include <header.h>
 #include <stdlib.h>
 
-
 void headers_init(Headers* headers, size_t initial_capacity) {
     headers->data = malloc(initial_capacity * sizeof(Header));
     headers->size = 0;  

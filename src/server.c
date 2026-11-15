@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <response.h>
 
 #define false 0
 #define true 1
@@ -76,12 +77,41 @@ void handle_connection(int fd, struct sockaddr_in* address, Server* server) {
     }
 
     // Sending a message back to the client
-    const char* message = "Hello back";
+    Response* response = malloc(sizeof(Response));
+
+    // Status line
+    char* version = "HTTP/1.1"; 
+    int status_code = 200;
+    char* reason_phrase = "OK";
+    
+    // Response headers
+    Headers* headers = malloc(sizeof(Headers));
+    headers_init(headers, 3);
+    headers_add(headers, (Header){"Server", "Apache"});
+    headers_add(headers, (Header){"Content-Type", "application/json"});
+    headers_add(headers, (Header){"Last-Modified", "Sun, 15 Nov 2026 9:45:00 EST"}); 
+
+    // Body 
+    char* body = "{message: \"This is the response\"}";
+     
+    // Converting response struct into string
+    response_init(
+        response,
+        version,
+        status_code,
+        reason_phrase,
+        headers,
+        body
+    );
+
+    // Parse response to string and send it to client socket
+    const char* message = response_to_string(response);
     size_t message_length = strlen(message);
     printf("Sending: %s\n\n", message);
     send(fd, message, message_length, 0);
         
     // Closing client socket connection
     request_free(request);
+    response_free(response);
     close(fd);
 }

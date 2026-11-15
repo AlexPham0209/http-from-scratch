@@ -1,5 +1,7 @@
+#pragma once
 #include <stddef.h>
 #include <header.h>
+
 typedef enum Method {
     GET,
     POST,  

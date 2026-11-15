@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct Server {
     const int PORT;
     const char* ADDRESS;

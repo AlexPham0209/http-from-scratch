@@ -18,6 +18,6 @@ typedef struct Request {
 } Request;
 
 char* get_line(char** str);
-Request* parse_request(char* request);
+Request* request_parse(char* request);
 void request_free(Request* request);
 Method get_method(char* method);

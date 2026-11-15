@@ -69,7 +69,7 @@ void handle_connection(int fd, struct sockaddr_in* address, Server* server) {
     printf("Message: %s", buffer);
 
     // Parsing the request and creating a request object allocated to the heap
-    Request* request = parse_request(buffer);
+    Request* request = request_parse(buffer);
     if (request == NULL) {
         perror("Invalid HTTP request");
         return;

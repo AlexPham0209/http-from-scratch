@@ -17,8 +17,12 @@ void headers_add(Headers* headers, Header header) {
 } 
 
 void headers_free(Headers* headers) {
+    if (headers == NULL)
+        return;
+
     free(headers->data);
     headers->data = NULL;
     headers->size = 0;
     headers->capacity = 0;
+    free(headers);
 }

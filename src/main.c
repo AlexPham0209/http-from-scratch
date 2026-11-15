@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
     char str[1][100] = {"GET / HTTP/1.1\r\nKEY: VALUE\r\nKEY2: VALUE2\r\n\r\nBODY"};
     char* ptr = str[0];
 
-    parse_request(ptr);
+    request_parse(ptr);
     // Server server = {
     //     PORT,
     //     IP_ADDRESS,

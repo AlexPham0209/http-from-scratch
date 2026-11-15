@@ -51,7 +51,7 @@ void test_get_line_2(void) {
 
 void test_request_success(void) {
     char request[] = "GET / HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\"}"; 
-    Request* req = parse_request(request);
+    Request* req = request_parse(request);
 
     // Asserting request is not null safely
     TEST_ASSERT_NOT_NULL(req);
@@ -76,7 +76,7 @@ void test_request_success(void) {
 
 void test_request_only_lf(void) {
     char request[] = "GET / HTTP/1.1\nHost: example.com\nContent-Type: application/json\n\n{\"status\": \"ok\"}"; 
-    Request* req = parse_request(request);
+    Request* req = request_parse(request);
 
     // Asserting request is not null safely
     TEST_ASSERT_NOT_NULL(req);
@@ -101,7 +101,7 @@ void test_request_only_lf(void) {
 
 void test_request_missing_request_line(void) {
     char request[] = "Host: example.com\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\"}"; 
-    Request* req = parse_request(request);
+    Request* req = request_parse(request);
     TEST_ASSERT_NULL(req);
 }
 
@@ -112,11 +112,11 @@ void test_request_malformed_request_line(void) {
     char request_4[] = "HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\"}"; 
     char request_5[] = "HTTP/1.1 / HTTP/1.1 Random nonsense\r\nHost: example.com\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\"}"; 
 
-    Request* req_1 = parse_request(request_1);
-    Request* req_2 = parse_request(request_2);
-    Request* req_3 = parse_request(request_3);
-    Request* req_4 = parse_request(request_4);
-    Request* req_5 = parse_request(request_5);
+    Request* req_1 = request_parse(request_1);
+    Request* req_2 = request_parse(request_2);
+    Request* req_3 = request_parse(request_3);
+    Request* req_4 = request_parse(request_4);
+    Request* req_5 = request_parse(request_5);
 
     // Asserting all return null
     TEST_ASSERT_NULL(req_1);
@@ -128,13 +128,13 @@ void test_request_malformed_request_line(void) {
 
 void test_request_malformed_header(void) {
     char request[] = "GET / HTTP/1.1\r\nHost\r\nContent-Type: application/json\r\n\r\n{\"status\": \"ok\"}"; 
-    Request* req = parse_request(request);
+    Request* req = request_parse(request);
     TEST_ASSERT_NULL(req);
 }
 
 void test_request_missing_headers(void) {
     char request[] = "GET / HTTP/1.1\r\n\r\n{\"status\": \"ok\"}"; 
-    Request* req = parse_request(request);
+    Request* req = request_parse(request);
 
     // Asserting requests are null
     TEST_ASSERT_EQUAL(GET, req->method);
@@ -152,13 +152,13 @@ void test_request_missing_headers(void) {
 
 void test_request_missing_empty_line(void) {
     char request[] = "GET / HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/json\r\n{\"status\": \"ok\"}"; 
-    Request* req = parse_request(request);
+    Request* req = request_parse(request);
     TEST_ASSERT_NULL(req);
 }
 
 void test_request_empty_body(void) {
     char request[] = "GET / HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/json\r\n\r\n"; 
-    Request* req = parse_request(request);
+    Request* req = request_parse(request);
 
     // Asserting request is not null
     TEST_ASSERT_NOT_NULL(req);

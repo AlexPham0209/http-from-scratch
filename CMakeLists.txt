@@ -52,10 +52,6 @@ add_executable(
     ${SRC_DIR}/main.c
 )
 
-add_executable(
-    run_http_tests
-    tests/test_request.c    
-)
 
 # Linking the library to the http_server executable target (http_server automatically gets access to ${INCLUDE_DIR} now)
 target_link_libraries(
@@ -64,12 +60,17 @@ target_link_libraries(
     http_library
 )
 
-# Linking http library and Google test library to unit tests executable
-target_link_libraries(
-    run_http_tests
-    PRIVATE
-    http_library
-    unity::framework
+# Setting up unit tests 
+set(TEST_FILES
+    tests/test_request.c
+    tests/test_response.c
 )
 
-add_test(NAME http_tests COMMAND run_http_tests)
+foreach(test_src ${TEST_FILES})
+    get_filename_component(test_name ${test_src} NAME_WE)
+
+    add_executable(${test_name} ${test_src})
+    target_link_libraries(${test_name} PRIVATE http_library unity::framework)
+
+    add_test(NAME ${test_name} COMMAND ${test_name})
+endforeach()

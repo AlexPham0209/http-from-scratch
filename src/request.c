@@ -4,13 +4,18 @@
 #include <string.h>
 #include <stdio.h>
 
-Request* parse_request(char* request) {
+Request* request_parse(char* request) {
+    if (request == NULL)
+        return NULL;
+
     // Invalid request if there is no empty line
     if (!strstr(request, "\r\n\r\n") && !strstr(request, "\n\n"))
         return NULL;
 
     // Duplicating request string (heap-allocated)
     char* data = strdup(request); 
+    if (data == NULL) 
+        return NULL;
     char* curr = data;
 
     // Getting request line information (Method, request target, HTTP Version) 
@@ -78,6 +83,12 @@ Request* parse_request(char* request) {
     
     // Setting request object
     Request* req = malloc(sizeof(Request));
+    if (req == NULL) {
+        free(data);
+        headers_free(headers);
+        return NULL;
+    }
+
     req->data = data;
     req->headers = headers;
     req->request_target = request_target;
@@ -101,8 +112,15 @@ Method get_method(char* method) {
 }
 
 void request_free(Request* request) {
-    headers_free(request->headers);
-    free(request->data);
+    if (request == NULL)
+        return;
+
+    if (request->headers != NULL)
+        headers_free(request->headers);
+    
+    if (request->data != NULL)
+        free(request->data);
+
     free(request);
 }
 

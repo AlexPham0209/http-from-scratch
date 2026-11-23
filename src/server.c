@@ -14,7 +14,7 @@
 
 void handle_connection(int fd, struct sockaddr_in* address, Server* server);
 
-int run(Server* server) {
+int server_listen(Server* server) {
     // Establishing a TCP socket that utilizes IPV4 addresses
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == -1) {
@@ -73,43 +73,25 @@ void handle_connection(int fd, struct sockaddr_in* address, Server* server) {
     Request* request = request_parse(buffer);
     if (request == NULL) {
         perror("Invalid HTTP request");
+        close(fd);
         return;
     }
 
-    // Sending a message back to the client
-    Response* response = malloc(sizeof(Response));
+    // Use handler function given to server to process and create response
+    Response* response = server->handle(request);
+    if (response == NULL) {
+        perror("Invalid response parsing");
+        request_free(request);
+        close(fd);
+        return;
+    }
 
-    // Status line
-    char* version = "HTTP/1.1"; 
-    int status_code = 200;
-    char* reason_phrase = "OK";
-    
-    // Response headers
-    Headers* headers = malloc(sizeof(Headers));
-    headers_init(headers, 3);
-    headers_add(headers, (Header){"Server", "Apache"});
-    headers_add(headers, (Header){"Content-Type", "application/json"});
-    headers_add(headers, (Header){"Last-Modified", "Sun, 15 Nov 2026 9:45:00 EST"}); 
-
-    // Body 
-    char* body = "{message: \"This is the response\"}";
-     
-    // Converting response struct into string
-    response_init(
-        response,
-        version,
-        status_code,
-        reason_phrase,
-        headers,
-        body
-    );
-
-    // Parse response to string and send it to client socket
+    // Parse response to string and send it to client 
     const char* message = response_to_string(response);
     size_t message_length = strlen(message);
     printf("Sending: %s\n\n", message);
     send(fd, message, message_length, 0);
-        
+    
     // Closing client socket connection
     request_free(request);
     response_free(response);

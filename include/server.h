@@ -2,6 +2,7 @@
 
 #include "request.h"
 #include "response.h"
+
 typedef struct Server {
     const int PORT;
     const char* ADDRESS;

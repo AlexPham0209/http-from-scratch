@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 project(http_from_scratch C)
 
 # Ensure a consistent C standard is used across compilers
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # Create clang configuration
@@ -37,6 +37,8 @@ add_library(
     include/response.h
     src/header.c
     include/header.h
+    include/serve.h
+    src/serve.c
 )
 
 # So, we can have headers from different directories added to each other with a relative path to the project directory.
